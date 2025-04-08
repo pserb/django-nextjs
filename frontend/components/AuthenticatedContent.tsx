@@ -1,4 +1,3 @@
-// components/AuthenticatedContent.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,23 +7,27 @@ import TestModelItem from "@/components/TestModelItem";
 import { TestModel } from "@/components/TestModelItem";
 import AddModelDialog from "@/components/AddModelDialog";
 import { Button } from "./ui/button";
-import { Dialog } from "@radix-ui/react-dialog";
 import DeleteAccountDialog from "./DeleteAccountDialog";
+import { LogOut, User, Database } from "lucide-react";
 
 export default function AuthenticatedContent() {
 	const [data, setData] = useState<TestModel[]>([]);
-	const { logout, destroyAccount } = useAuth();
+	const [isLoading, setIsLoading] = useState(true);
+	const { logout, user } = useAuth();
 
 	useEffect(() => {
 		fetchData();
 	}, []);
 
 	const fetchData = async () => {
+		setIsLoading(true);
 		try {
 			const response = await api.get("http://localhost:8000/testmodel/");
 			setData(response.data);
 		} catch (error) {
 			console.error("Failed to fetch data:", error);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -46,19 +49,46 @@ export default function AuthenticatedContent() {
 		}
 	};
 
-	const { user } = useAuth();
-
 	return (
-		<div className="flex flex-col items-start py-8 space-y-4 max-w-lg m-auto bg-[rgba(255,255,255,0.2)] text-white p-8 mt-8">
-			<h1 className="font-bold text-4xl">Logged in as {user?.username}</h1>
-			<div className="flex flex-row justify-between w-full">
-				<Button onClick={logout}>Logout</Button>
-				<DeleteAccountDialog />
+		<div className="max-w-screen-lg mx-auto px-4 py-8">
+			<div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+				<div className="flex items-center gap-3">
+					<div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+						<User size={20} />
+					</div>
+					<h1 className="text-3xl font-bold text-primary">Welcome, {user?.username}</h1>
+				</div>
+				
+				<div className="flex space-x-2">
+					<Button onClick={logout} variant="outline" size="sm" className="flex items-center gap-2 border-muted text-muted-foreground hover:text-foreground">
+						<LogOut size={16} />
+						Logout
+					</Button>
+					<DeleteAccountDialog />
+				</div>
 			</div>
-			<AddModelDialog addModel={addModel} />
-			{data.map((item: TestModel) => (
-				<TestModelItem key={item.id} item={item} onDelete={deleteModel} />
-			))}
+			
+			<div className="bg-card rounded-lg border border-border shadow-sm p-6">
+				<div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+					<div className="flex items-center gap-2">
+						<Database size={20} className="text-primary" />
+						<h2 className="text-2xl font-semibold text-primary">Models</h2>
+					</div>
+					<AddModelDialog addModel={addModel} />
+				</div>
+				
+				{isLoading ? (
+					<div className="py-8 text-center text-muted-foreground">Loading...</div>
+				) : data.length === 0 ? (
+					<div className="py-8 text-center text-muted-foreground">No models found. Add your first model!</div>
+				) : (
+					<div className="space-y-4 divide-y divide-border">
+						{data.map((item: TestModel) => (
+							<TestModelItem key={item.id} item={item} onDelete={deleteModel} />
+						))}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

@@ -3,10 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
+import { Trash2, AlertTriangle, Loader2 } from "lucide-react";
 
 export default function DeleteAccountDialog() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -30,19 +28,38 @@ export default function DeleteAccountDialog() {
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button className="text-black" variant="destructive">
+				<Button variant="outline" size="sm" className="flex items-center gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20">
+					<Trash2 size={16} />
 					Delete Account
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent className="sm:max-w-[425px] bg-card border-border">
 				<DialogHeader>
-					<DialogTitle>Are you sure you want to delete your account?</DialogTitle>
-					<DialogDescription>This process is not reversible.</DialogDescription>
+					<DialogTitle className="flex items-center gap-2 text-destructive">
+						<AlertTriangle className="h-5 w-5 text-destructive" />
+						Delete Account
+					</DialogTitle>
+					<DialogDescription className="text-muted-foreground">
+						This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleSubmit}>
-					<DialogFooter>
-						<Button type="submit" variant={"destructive"} disabled={isSubmitting}>
-							{isSubmitting ? "Deleting..." : "Delete Account"}
+					<DialogFooter className="gap-2 sm:gap-0 mt-4">
+						<Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="border-muted text-muted-foreground">
+							Cancel
+						</Button>
+						<Button type="submit" variant="destructive" disabled={isSubmitting} className="bg-destructive text-destructive-foreground">
+							{isSubmitting ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Deleting...
+								</>
+							) : (
+								<>
+									<Trash2 className="mr-2 h-4 w-4" />
+									Delete Account
+								</>
+							)}
 						</Button>
 					</DialogFooter>
 				</form>

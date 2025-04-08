@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 
 export interface TestModel {
 	id: number;
@@ -16,7 +16,6 @@ interface TestModelItemProps {
 }
 
 export default function TestModelItem({ item, onDelete }: TestModelItemProps) {
-	"use client";
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	const handleDelete = async () => {
@@ -26,20 +25,28 @@ export default function TestModelItem({ item, onDelete }: TestModelItemProps) {
 	};
 
 	return (
-		// have the delete button all the way to the right and at the top of the item
-		<div className="flex flex-row justify-between items-start w-full">
-			<div className="flex flex-col">
-				<h1 className="font-bold text-2xl">{item.title}</h1>
-				<p>{item.description}</p>
+		<div className="flex flex-col sm:flex-row justify-between items-start w-full py-4 group">
+			<div className="flex flex-col space-y-1">
+				<h3 className="font-medium text-xl text-accent">{item.title}</h3>
+				<p className="text-foreground">{item.description}</p>
 			</div>
-			<Button onClick={handleDelete} disabled={isDeleting} variant={"ghost"} className="mt-4">
+			<Button 
+				onClick={handleDelete} 
+				disabled={isDeleting} 
+				variant="ghost" 
+				size="sm" 
+				className="mt-2 sm:mt-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+			>
 				{isDeleting ? (
 					<>
-						<Loader2 className="animate-spin" size={16} />
+						<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 						Deleting...
 					</>
 				) : (
-					"Delete"
+					<>
+						<Trash2 className="mr-2 h-4 w-4" />
+						Delete
+					</>
 				)}
 			</Button>
 		</div>
